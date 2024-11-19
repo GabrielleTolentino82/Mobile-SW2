@@ -2,70 +2,62 @@ import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet, Text, Alert } from 'react-native';
 import axios from 'axios';
 
-const adicionar = ({ navigation }) => {
+const Adicionar = ({ navigation }) => {
   const [nome, setNome] = useState('');
-  const [descricao, setDescricao] = useState('');
-  const [qtd, setQtd] = useState('');
-  const [marca, setMarca] = useState('');
-  const [preco, setPreco] = useState('');
-  const [validade, setValidade] = useState('');
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
 
-  const handleAddProduct = async () => {
+  const handleAddUser = async () => {
 
-    if (!nome || !descricao || !qtd || !marca || !preco || !validade) {
+    if (!nome || !email || !senha) {
       Alert.alert('Erro', 'Todos os campos são obrigatórios.');
       return;
     }
 
-    const quantidade = parseInt(qtd, 10);
-    const precoValue = parseFloat(preco);
-    if (isNaN(quantidade) || isNaN(precoValue)) {
-      Alert.alert('Erro', 'Quantidade e Preço devem ser números válidos.');
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!email.match(emailRegex)) {
+      Alert.alert('Erro', 'Por favor, insira um email válido.');
       return;
     }
 
-    const validadeRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!validade.match(validadeRegex)) {
-      Alert.alert('Erro', 'Formato de validade inválido. Use YYYY-MM-DD.');
+    if (senha.length < 6) {
+      Alert.alert('Erro', 'A senha deve ter pelo menos 6 caracteres.');
       return;
     }
 
     try {
-      const productData = {
+      const userData = {
         nome,
-        descricao,
-        qtd: quantidade,
-        marca,
-        preco: precoValue,
-        validade,
+        email,
+        senha,
       };
 
-      console.log('Dados a serem enviados:', productData);
+      console.log('Dados a serem enviados:', userData);
 
-      const response = await axios.post('http://localhost/DESKTOP/Controller/produto.php', productData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      console.log('Resposta da API:', response.data);
-
-      if (response.status === 200) {
-        console.log('Produto adicionado:', response.data);
-        navigation.navigate('ProductsScreen');
-      } else {
-        Alert.alert('Erro', response.data.msg || 'Erro ao adicionar produto.');
+        const response = await axios.post('http://localhost/back/Controller/usuario.php', userData, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+      
+        console.log('Resposta da API:', response.data);
+      
+        if (response.status === 200) {
+          console.log('Usuário adicionado:', response.data);
+          navigation.navigate('UsersScreen');
+        } else {
+          Alert.alert('Erro', response.data.msg || 'Erro ao adicionar usuário.');
+        }
+      } catch (error) {
+        console.error('Erro ao adicionar usuário:', error.response ? error.response.data : error);
+        Alert.alert('Erro', 'Ocorreu um erro ao tentar adicionar o usuário.');
       }
-    } catch (error) {
-      console.error('Erro ao adicionar produto:', error.response ? error.response.data : error);
-      Alert.alert('Erro', 'Ocorreu um erro ao tentar adicionar o produto.');
-    }
-  };
+    };
 
   return (
     <View style={styles.container}>
       <View style={styles.formContainer}>
-        <Text style={styles.title}>Adicionar Produto</Text>
+        <Text style={styles.title}>Adicionar Usuário</Text>
         <TextInput
           placeholder="Nome"
           value={nome}
@@ -73,38 +65,20 @@ const adicionar = ({ navigation }) => {
           style={styles.input}
         />
         <TextInput
-          placeholder="Descrição"
-          value={descricao}
-          onChangeText={setDescricao}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
           style={styles.input}
+          keyboardType="email-address"
         />
         <TextInput
-          placeholder="Quantidade"
-          value={qtd}
-          onChangeText={setQtd}
+          placeholder="Senha"
+          value={senha}
+          onChangeText={setSenha}
           style={styles.input}
-          keyboardType="numeric"
+          secureTextEntry
         />
-        <TextInput
-          placeholder="Marca"
-          value={marca}
-          onChangeText={setMarca}
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Preço"
-          value={preco}
-          onChangeText={setPreco}
-          style={styles.input}
-          keyboardType="numeric"
-        />
-        <TextInput
-          placeholder="Validade (YYYY-MM-DD)"
-          value={validade}
-          onChangeText={setValidade}
-          style={styles.input}
-        />
-        <TouchableOpacity style={styles.button} onPress={handleAddProduct}>
+        <TouchableOpacity style={styles.button} onPress={handleAddUser}>
           <Text style={styles.buttonText}>Adicionar</Text>
         </TouchableOpacity>
       </View>
@@ -164,4 +138,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default adicionar;
+export default Adicionar;

@@ -4,92 +4,76 @@ import axios from 'axios';
 
 const { width, height } = Dimensions.get('window');
 
-const ProductsScreen = ({ navigation }) => {
-  const [products, setProducts] = useState([]);
+const UsersScreen = ({ navigation }) => {
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const fetchProducts = async () => {
+  const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://localhost/DESKTOP/Controller/produto.php');
-      setProducts(response.data);
+      const response = await axios.get('http://localhost/back/Controller/usuario.php');
+      setUsers(response.data);
     } catch (error) {
-      console.error('Erro ao buscar os produtos:', error);
+      console.error('Erro ao buscar os usuários:', error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchUsers();
   }, []);
 
   if (loading) {
     return (
       <View style={styles.loader}>
         <ActivityIndicator size="large" color="#488aec" />
-        <Text style={styles.loadingText}>Carregando produtos...</Text>
+        <Text style={styles.loadingText}>Carregando usuários...</Text>
       </View>
     );
   }
 
-  const handleNextProduct = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % products.length);
+  const handleNextUser = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % users.length);
   };
 
-  const handlePrevProduct = () => {
+  const handlePrevUser = () => {
     setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? products.length - 1 : prevIndex - 1
+      prevIndex === 0 ? users.length - 1 : prevIndex - 1
     );
   };
 
-  const currentProduct = products[currentIndex];
+  const currentUser = users[currentIndex];
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
-
-        <Pressable style={styles.btn} onPress={() => navigation.navigate('adicionar')}>
-          <Text style={styles.btnText}>Adicionar Produto</Text>
-        </Pressable>
-        <Pressable style={styles.btn} onPress={() => navigation.navigate('deletar')}>
-          <Text style={styles.btnText}>Deletar um Produto</Text>
-        </Pressable>
-        <Pressable style={styles.btn} onPress={() => navigation.navigate('atualizar')}>
-          <Text style={styles.btnText}>Atualizar um Produto</Text>
-        </Pressable>
-        <Pressable style={styles.btn} onPress={() => navigation.navigate('atualizar_parcialmente')}>
-          <Text style={styles.btnText}>Atualizar um Produto parcialmente</Text>
+        
+        <Pressable style={styles.btn} onPress={() => navigation.navigate('Adicionar')}>
+          <Text style={styles.btnText}>Adicionar Usuário</Text>
         </Pressable>
 
-        <View style={styles.produtoContainer}>
-          <View style={styles.card}>
-            <View style={styles.card__content}>
-              <Text style={styles.cardTitle}>{currentProduct.nome}</Text>
-              <Text style={styles.cardText}>
-                <Text style={styles.label}>Descrição:</Text> {currentProduct.descricao}
-              </Text>
-              <Text style={styles.cardText}>
-                <Text style={styles.label}>Quantidade:</Text> {currentProduct.qtd}
-              </Text>
-              <Text style={styles.cardText}>
-                <Text style={styles.label}>Marca:</Text> {currentProduct.marca}
-              </Text>
-              <Text style={styles.cardText}>
-                <Text style={styles.label}>Preço:</Text> R${currentProduct.preco}
-              </Text>
-              <Text style={styles.cardText}>
-                <Text style={styles.label}>Validade:</Text> {currentProduct.validade}
-              </Text>
+        <View style={styles.userContainer}>
+          {currentUser && (
+            <View style={styles.card}>
+              <View style={styles.card__content}>
+                <Text style={styles.cardTitle}>{currentUser.nome}</Text>
+                <Text style={styles.cardText}>
+                  <Text style={styles.label}>Email:</Text> {currentUser.email}
+                </Text>
+                <Text style={styles.cardText}>
+                  <Text style={styles.label}>Senha:</Text> {currentUser.senha}
+                </Text>
+              </View>
             </View>
-          </View>
+          )}
         </View>
 
         <View style={styles.navigationContainer}>
-          <Pressable style={styles.navButton} onPress={handlePrevProduct}>
+          <Pressable style={styles.navButton} onPress={handlePrevUser}>
             <Text style={styles.navButtonText}>Anterior</Text>
           </Pressable>
-          <Pressable style={styles.navButton} onPress={handleNextProduct}>
+          <Pressable style={styles.navButton} onPress={handleNextUser}>
             <Text style={styles.navButtonText}>Próximo</Text>
           </Pressable>
         </View>
@@ -132,7 +116,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: width < 400 ? 16 : 18, 
   },
-  produtoContainer: {
+  userContainer: {
     alignItems: 'center',
     marginVertical: 20,
   },
@@ -203,4 +187,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProductsScreen;
+export default UsersScreen;
